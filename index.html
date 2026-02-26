@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train Once, Answer All: Many Pretraining Experiments for the Cost of One</title>
+    <meta name="description" content="Project page for the ICLR 2026 paper: Train Once, Answer All — Many Pretraining Experiments for the Cost of One.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #333;
+            background: #fff;
+            line-height: 1.7;
+        }
+
+        /* --- Layout --- */
+        .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+        section { padding: 48px 0; }
+        section.alt { background: #f5f5f5; }
+
+        /* --- Hero --- */
+        .hero {
+            text-align: center;
+            padding: 64px 0 48px;
+        }
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #0c5da5;
+            margin-bottom: 8px;
+        }
+        .hero .subtitle {
+            font-size: 1.25rem;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .hero .authors {
+            font-size: 1.05rem;
+            margin-bottom: 8px;
+        }
+        .hero .authors a {
+            color: #333;
+            text-decoration: none;
+        }
+        .hero .authors a:hover { text-decoration: underline; }
+        .hero .affiliations {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 16px;
+        }
+        .venue-badge {
+            display: inline-block;
+            background: #0c5da5;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 4px 14px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+        }
+        .btn-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary {
+            background: #0c5da5;
+            color: #fff;
+        }
+        .btn-primary:hover { background: #094a84; }
+        .btn-outline {
+            border: 2px solid #0c5da5;
+            color: #0c5da5;
+            background: transparent;
+        }
+        .btn-outline:hover { background: #e8f0fa; }
+        .btn img { height: 20px; width: 20px; object-fit: contain; }
+
+        /* --- Section headings --- */
+        h2 {
+            font-size: 1.6rem;
+            color: #0c5da5;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        h3 {
+            font-size: 1.15rem;
+            color: #0c5da5;
+            margin-bottom: 8px;
+        }
+
+        /* --- Teaser --- */
+        .teaser-img {
+            display: block;
+            max-width: 100%;
+            margin: 0 auto;
+            border-radius: 6px;
+        }
+        .caption {
+            text-align: center;
+            font-size: 0.88rem;
+            color: #666;
+            margin-top: 12px;
+            max-width: 780px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* --- Abstract --- */
+        .abstract-text {
+            font-size: 1rem;
+            max-width: 780px;
+            margin: 0 auto;
+            text-align: justify;
+        }
+
+        /* --- TL;DR --- */
+        .tldr-list {
+            max-width: 780px;
+            margin: 0 auto;
+            list-style: none;
+            padding: 0;
+        }
+        .tldr-list li {
+            padding: 10px 0 10px 28px;
+            position: relative;
+        }
+        .tldr-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 18px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #0c5da5;
+        }
+
+        /* --- Experiments table --- */
+        .table-wrap { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.92rem;
+        }
+        thead th {
+            background: #0c5da5;
+            color: #fff;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+        }
+        tbody td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        tbody tr:hover { background: #f0f6fc; }
+        .cat-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .cat-learning { background: #0c5da5; }
+        .cat-memorization { background: #d9534f; }
+        .cat-forgetting { background: #5cb85c; }
+
+        /* --- Figure grids --- */
+        .fig-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 16px;
+        }
+        .fig-grid.two-col {
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .fig-card {
+            text-align: center;
+        }
+        .fig-card img {
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            background: #fff;
+        }
+        .fig-card .fig-caption {
+            font-size: 0.85rem;
+            color: #555;
+            margin-top: 8px;
+        }
+
+        /* --- Single figure --- */
+        .single-fig {
+            text-align: center;
+            margin-top: 16px;
+        }
+        .single-fig img {
+            max-width: 420px;
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            background: #fff;
+        }
+
+        /* --- Section text --- */
+        .section-text {
+            max-width: 780px;
+            margin: 16px auto 0;
+            text-align: justify;
+        }
+
+        /* --- BibTeX --- */
+        .bibtex-block {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border-radius: 8px;
+            padding: 20px 24px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.82rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            position: relative;
+            white-space: pre;
+            max-width: 780px;
+            margin: 0 auto;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #45475a;
+            color: #cdd6f4;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: 'Noto Sans', sans-serif;
+            transition: background 0.2s;
+        }
+        .copy-btn:hover { background: #585b70; }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 32px 0;
+            color: #888;
+            font-size: 0.85rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 700px) {
+            .hero h1 { font-size: 1.7rem; }
+            .hero .subtitle { font-size: 1.05rem; }
+            .fig-grid { grid-template-columns: repeat(2, 1fr); }
+            .fig-grid.two-col { grid-template-columns: 1fr; }
+            section { padding: 32px 0; }
+        }
+        @media (max-width: 480px) {
+            .fig-grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 1.4rem; }
+            .btn { padding: 8px 16px; font-size: 0.88rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ====== Hero ====== -->
+<section class="hero">
+    <div class="container">
+        <h1>Train Once, Answer All</h1>
+        <p class="subtitle">Many Pretraining Experiments for the Cost of One</p>
+        <p class="authors">
+            <a href="https://sbordt.github.io/" target="_blank">Sebastian Bordt</a><sup>1</sup> &nbsp;&middot;&nbsp;
+            <a href="https://www.martinpawelczyk.com/" target="_blank">Martin Pawelczyk</a><sup>2</sup>
+        </p>
+        <p class="affiliations"><sup>1</sup>University of T&uuml;bingen &amp; T&uuml;bingen AI Center &nbsp;&nbsp; <sup>2</sup>University of Vienna</p>
+        <span class="venue-badge">ICLR 2026</span>
+        <div class="btn-row">
+            <a class="btn btn-primary" href="https://arxiv.org/abs/2502.06738" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                Paper
+            </a>
+            <a class="btn btn-outline" href="https://github.com/sbordt/pretrain-experiments" target="_blank">
+                <img src="static/images/GitHub.png" alt="GitHub">
+                Code
+            </a>
+            <a class="btn btn-outline" href="https://huggingface.co/collections/sbordt/train-once-answer-all-67a4ad2b24780bf748a87c45" target="_blank">
+                <img src="static/images/HuggingFace.png" alt="Hugging Face">
+                Models &amp; Data
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ====== Teaser ====== -->
+<section class="alt">
+    <div class="container">
+        <img class="teaser-img" src="static/images/teaser.png" alt="Teaser figure showing the Train Once, Answer All paradigm">
+        <p class="caption"><strong>We propose to conduct multiple independent pretraining experiments in a single training run.</strong>
+        <span style="color:#c19a6b;">Top:</span> Previous research performs one experiment per training run.
+        <span style="color:#0c5da5;">Bottom:</span> We conduct multiple experiments simultaneously, answering many research questions while training only once.</p>
+    </div>
+</section>
+
+<!-- ====== Abstract ====== -->
+<section>
+    <div class="container">
+        <h2>Abstract</h2>
+        <p class="abstract-text">
+            Recent work has demonstrated that controlled pretraining experiments are a powerful tool for studying
+            the relationship between training data and large language model (LLM) behavior.
+            However, the computational cost of pretraining presents a significant constraint. To overcome this constraint, we propose a new approach where multiple experiments are conducted simultaneously during a <em>single</em> training run. We validate our approach by performing ten experiments while training on 210B tokens, with models of up to 2.7B parameters. Although models are trained only once, we can replicate the results of multiple previous works on data contamination, poisoning, and memorization. We also conduct novel investigations into knowledge acquisition, mathematical reasoning, and watermarking. For example, we dynamically update the training data until a model acquires a particular piece of knowledge. Remarkably, the influence of the experiments on the model's training dynamics and overall performance is minimal. However, interactions between experiments may act as a confounder in our approach. We propose continual pretraining dependence testing (CPDT), a novel technique to test for interactions with continual pretraining experiments, finding them to be negligible in our setup. Overall, our results suggest that performing multiple pretraining experiments within a single training run can enable rigorous scientific experimentation with large models on a compute budget.
+        </p>
+    </div>
+</section>
+
+<!-- ====== TL;DR ====== -->
+<section class="alt">
+    <div class="container">
+        <h2>Key Contributions</h2>
+        <ul class="tldr-list">
+            <li>We propose to conduct <strong>multiple independent pretraining experiments within the same training run</strong>, significantly reducing the computational cost. We validate our approach up to a model size of 2.7B parameters.</li>
+            <li>We <strong>replicate results from five prior works</strong> within a single training run, and demonstrate the utility of the approach with <strong>three novel experiments</strong> on knowledge acquisition, mathematical reasoning, and training data watermarking.</li>
+            <li>We introduce <strong>Continual Pretraining Dependence Testing (CPDT)</strong>, a novel method to measure dependencies between experiments before pretraining.</li>
+            <li>We demonstrate that the experiments have a <strong>limited impact on training dynamics and overall performance</strong>, suggesting that performing multiple pretraining experiments is practical.</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ====== Experiments Table ====== -->
+<section>
+    <div class="container">
+        <h2>The Ten Experiments</h2>
+        <p class="section-text" style="margin-top:0;margin-bottom:20px;text-align:center;">Together, the experiments modify 3.7B tokens or 1.8% of the pretraining data.</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Experiment</th>
+                        <th>Abbr.</th>
+                        <th>Modified Tokens</th>
+                        <th>Replication</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Knowledge Acquisition</td>
+                        <td>KA</td>
+                        <td>26M</td>
+                        <td></td>
+                        <td><span class="cat-dot cat-learning"></span>Learning &amp; Generalization</td>
+                    </tr>
+                    <tr>
+                        <td>Mathematical Reasoning</td>
+                        <td>MR</td>
+                        <td>180M</td>
+                        <td></td>
+                        <td><span class="cat-dot cat-learning"></span>Learning &amp; Generalization</td>
+                    </tr>
+                    <tr>
+                        <td>Benchmark Contamination</td>
+                        <td>BC</td>
+                        <td>106M</td>
+                        <td>Yes</td>
+                        <td><span class="cat-dot cat-learning"></span>Learning &amp; Generalization</td>
+                    </tr>
+                    <tr>
+                        <td>Memorization Patterns</td>
+                        <td>MemP</td>
+                        <td>246M</td>
+                        <td>Yes</td>
+                        <td><span class="cat-dot cat-memorization"></span>Memorization &amp; Privacy</td>
+                    </tr>
+                    <tr>
+                        <td>Verbatim Memorization</td>
+                        <td>MemV</td>
+                        <td>1.1B</td>
+                        <td>Yes</td>
+                        <td><span class="cat-dot cat-memorization"></span>Memorization &amp; Privacy</td>
+                    </tr>
+                    <tr>
+                        <td>Gaussian Watermarks</td>
+                        <td>GW</td>
+                        <td>209.7M</td>
+                        <td></td>
+                        <td><span class="cat-dot cat-memorization"></span>Memorization &amp; Privacy</td>
+                    </tr>
+                    <tr>
+                        <td>Pretraining Poisoning</td>
+                        <td>PP</td>
+                        <td>235M</td>
+                        <td>Yes</td>
+                        <td><span class="cat-dot cat-memorization"></span>Memorization &amp; Privacy</td>
+                    </tr>
+                    <tr>
+                        <td>Forgetting Curves</td>
+                        <td>FC</td>
+                        <td>19M</td>
+                        <td>Yes</td>
+                        <td><span class="cat-dot cat-forgetting"></span>Forgetting &amp; Unlearning</td>
+                    </tr>
+                    <tr>
+                        <td>Muse-News</td>
+                        <td>MUSE</td>
+                        <td>152M</td>
+                        <td></td>
+                        <td><span class="cat-dot cat-forgetting"></span>Forgetting &amp; Unlearning</td>
+                    </tr>
+                    <tr>
+                        <td>IID Replacements</td>
+                        <td>IID</td>
+                        <td>1.5B</td>
+                        <td></td>
+                        <td><span class="cat-dot cat-forgetting"></span>Forgetting &amp; Unlearning</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ====== Novel Experiments ====== -->
+<section class="alt">
+    <div class="container">
+        <h2>Three Novel Pretraining Experiments</h2>
+        <div class="fig-grid">
+            <div class="fig-card">
+                <img src="static/images/knowledge-acquisition.png" alt="Knowledge Acquisition experiment results">
+                <p class="fig-caption"><strong>(a) Knowledge Acquisition.</strong> A control algorithm successfully maintains the value of the knowledge probe close to the target.</p>
+            </div>
+            <div class="fig-card">
+                <img src="static/images/gsm.png" alt="Mathematical Reasoning experiment results">
+                <p class="fig-caption"><strong>(b) Mathematical Reasoning.</strong> The model exhibits length generalization to more complex mathematical reasoning problems.</p>
+            </div>
+            <div class="fig-card">
+                <img src="static/images/gaussian-watermarks.png" alt="Gaussian Watermarks experiment results">
+                <p class="fig-caption"><strong>(c) Gaussian Watermarks.</strong> Gaussian Pretraining Watermarks are detectable over the course of training.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====== Replicated Experiments ====== -->
+<section>
+    <div class="container">
+        <h2>Five Experiments from Previous Work</h2>
+        <p class="section-text" style="margin-top:0;margin-bottom:20px;">All replication experiments were successful, faithfully reproducing the conceptual results from prior studies. Figures from three of the five replicated experiments are shown below.</p>
+        <div class="fig-grid">
+            <div class="fig-card">
+                <img src="static/images/benchmark-contamination.png" alt="Benchmark Contamination experiment results">
+                <p class="fig-caption"><strong>(a) Benchmark Contamination.</strong> Minor benchmark contamination is almost completely forgotten during training.</p>
+            </div>
+            <div class="fig-card">
+                <img src="static/images/memorization-patterns.png" alt="Memorization Patterns experiment results">
+                <p class="fig-caption"><strong>(b) Memorization Patterns.</strong> Rare tokens provide the most powerful canaries, replicating prior findings.</p>
+            </div>
+            <div class="fig-card">
+                <img src="static/images/prompt-extraction.png" alt="Pretraining Poisoning experiment results">
+                <p class="fig-caption"><strong>(c) Pretraining Poisoning.</strong> The poisoned model allows for prompt extraction with the trigger string.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====== CPDT ====== -->
+<section class="alt">
+    <div class="container">
+        <h2>Are the Experiments Independent?</h2>
+        <p class="section-text" style="margin-top:0;margin-bottom:20px;">We propose <strong>Continual Pretraining Dependence Testing (CPDT)</strong>, a method for identifying dependencies between experiments before pretraining. CPDT measures how the outcome of one experiment changes when training on data from another experiment, producing an <em>n &times; n</em> dependence matrix.</p>
+        <div class="fig-grid two-col">
+            <div class="fig-card">
+                <img src="static/images/benchmark-dependence-matrix.png" alt="Benchmark dependence matrix">
+                <p class="fig-caption"><strong>(a) Benchmarks.</strong> Positive off-diagonal entries indicate significant dependencies between language modeling benchmarks.</p>
+            </div>
+            <div class="fig-card">
+                <img src="static/images/task-dependence-matrix.png" alt="Experiment dependence matrix">
+                <p class="fig-caption"><strong>(b) Experiments.</strong> In contrast, our controlled experiments show no evidence of such dependencies.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====== Training Dynamics ====== -->
+<section>
+    <div class="container">
+        <h2>Minimal Impact on Training</h2>
+        <p class="section-text" style="margin-top:0;margin-bottom:20px;">The training dynamics of the model with experiments are remarkably similar to the baseline model. The validation loss on 200M held-out tokens closely follows the original OLMo-2-1B training run.</p>
+        <div class="single-fig">
+            <img src="static/images/val-loss.png" alt="Validation loss comparison">
+            <p class="caption">Validation loss comparison between the model with experiments and the baseline. The trajectories are nearly identical.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ====== BibTeX ====== -->
+<section class="alt">
+    <div class="container">
+        <h2>Citation</h2>
+        <div class="bibtex-block" id="bibtex">
+            <button class="copy-btn" onclick="copyBibtex()">Copy</button>
+@inproceedings{bordt2025train,
+  title={Train Once, Answer All: Many Pretraining
+         Experiments for the Cost of One},
+  author={Bordt, Sebastian and Pawelczyk, Martin},
+  booktitle={International Conference on Learning
+             Representations (ICLR)},
+  year={2026},
+  url={https://arxiv.org/abs/2502.06738}
+}</div>
+    </div>
+</section>
+
+<!-- ====== Footer ====== -->
+<footer>
+    <div class="container">
+        <p>Website template inspired by <a href="https://nerfies.github.io/" target="_blank" style="color:#0c5da5;">Nerfies</a>. &copy; 2026 Sebastian Bordt &amp; Martin Pawelczyk.</p>
+    </div>
+</footer>
+
+<script>
+function copyBibtex() {
+    const bibtex = document.getElementById('bibtex').textContent
+        .replace('Copy', '').trim();
+    navigator.clipboard.writeText(bibtex).then(function() {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    });
+}
+</script>
+
+</body>
+</html>
