@@ -20,6 +20,7 @@
 
         /* --- Layout --- */
         .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+        .container.wide { max-width: 1060px; }
 
         section { padding: 48px 0; }
         section.alt { background: #f5f5f5; }
@@ -205,8 +206,6 @@
         .fig-card img {
             width: 100%;
             border-radius: 4px;
-            border: 1px solid #e0e0e0;
-            background: #fff;
         }
         .fig-card .fig-caption {
             font-size: 0.85rem;
@@ -223,8 +222,6 @@
             max-width: 420px;
             width: 100%;
             border-radius: 4px;
-            border: 1px solid #e0e0e0;
-            background: #fff;
         }
 
         /* --- Section text --- */
@@ -321,7 +318,7 @@
 
 <!-- ====== Teaser ====== -->
 <section class="alt">
-    <div class="container">
+    <div class="container wide">
         <img class="teaser-img" src="static/images/teaser.png" alt="Teaser figure showing the Train Once, Answer All paradigm">
         <p class="caption"><strong>We propose to conduct multiple independent pretraining experiments in a single training run.</strong>
         <span style="color:#c19a6b;">Top:</span> Previous research performs one experiment per training run.
